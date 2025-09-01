@@ -37,24 +37,69 @@ $(document).ready(function () {
         }, 500, 'linear')
     });
 
-    // <!-- emailjs to mail contact form data -->
     $("#contact-form").submit(function (event) {
-        emailjs.init("user_TTDmetQLYgWCLzHTDgqxm");
-
-        emailjs.sendForm('service_bvrmt0h', 'template_fz476sl', '#contact-form')
-            .then(function (response) {
-                console.log('SUCCESS!', response.status, response.text);
+        event.preventDefault(); // Prevent default form submission
+        
+        // Get form values
+        var nameValue = $('input[name="name"]').val();
+        var emailValue = $('input[name="email"]').val();
+        var phoneValue = $('input[name="phone"]').val();
+        var messageValue = $('textarea[name="message"]').val();
+        
+        // Validate required fields
+        if (!emailValue) {
+            alert("Please fill in Email.");
+            return;
+        }
+        
+        // HubSpot API settings
+        var settings = {
+            "url": "https://api.hsforms.com/submissions/v3/integration/submit/243234182/ef1ae9c1-bb01-4bb1-81f3-73cdf41125bf",
+            "method": "POST",
+            "timeout": 0,
+            "headers": {
+                "Content-Type": "application/json",
+                "Cookie": "__cf_bm=IISbENXKAIFMuLYdGtDkpaoR6edU8eTZdg32ER1l8hI-1756724258-1.0.1.1-bKjfYb2Xka.hMUAmMkA8jyKRrbxroxvHfldfSXejGUKv3OEOxS2U54J5n50nrWhgWsa6_c8GqKB.S9XgEsPMU6YA58y7SqcB3l29bGBL_jU; _cfuvid=WL3KpM1mMDuq4mEb4KTuPhaPeL.0YHJA92A3IEHfHmo-1756724258541-0.0.1.1-604800000"
+            },
+            "data": JSON.stringify({
+                "fields": [
+                    {
+                        "name": "firstname",
+                        "value": nameValue
+                    },
+                    {
+                        "name": "email",
+                        "value": emailValue
+                    },
+                    {
+                        "name": "phone",
+                        "value": phoneValue
+                    },
+                    {
+                        "name": "message",
+                        "value": messageValue
+                    }
+                ],
+                "context": {
+                    "pageUri": window.location.href, // Dynamic page URL
+                    "pageName": "Contact Form Submission"
+                }
+            }),
+        };
+        
+        // Submit to HubSpot
+        $.ajax(settings)
+            .done(function (response) {
+                console.log('SUCCESS!', response);
                 document.getElementById("contact-form").reset();
                 alert("Form Submitted Successfully");
-            }, function (error) {
-                console.log('FAILED...', error);
+            })
+            .fail(function (xhr, status, error) {
+                console.log('FAILED...', xhr.responseText || error);
                 alert("Form Submission Failed! Try Again");
             });
-        event.preventDefault();
+        });
     });
-    // <!-- emailjs to mail contact form data -->
-
-});
 
 document.addEventListener('visibilitychange',
     function () {
