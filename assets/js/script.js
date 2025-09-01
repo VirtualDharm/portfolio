@@ -1,3 +1,43 @@
+// Function to show custom notifications
+function showNotification(message, type) {
+    // Remove any existing notifications
+    $('.custom-notification').remove();
+    
+    // Create notification element
+    var notification = $(`
+        <div class="custom-notification ${type}">
+            <span class="notification-message">${message}</span>
+            <span class="notification-close">&times;</span>
+        </div>
+    `);
+    
+    // Add to body
+    $('body').append(notification);
+    
+    // Show notification with animation
+    setTimeout(function() {
+        notification.addClass('show');
+    }, 100);
+    
+    // Auto hide after 3 seconds
+    setTimeout(function() {
+        hideNotification(notification);
+    }, 3000);
+    
+    // Manual close on click
+    notification.find('.notification-close').click(function() {
+        hideNotification(notification);
+    });
+}
+
+// Function to hide notification
+function hideNotification(notification) {
+    notification.removeClass('show');
+    setTimeout(function() {
+        notification.remove();
+    }, 300);
+}
+
 $(document).ready(function () {
 
     $('#menu').click(function () {
@@ -92,14 +132,14 @@ $(document).ready(function () {
             .done(function (response) {
                 console.log('SUCCESS!', response);
                 document.getElementById("contact-form").reset();
-                alert("Form Submitted Successfully");
+                showNotification("Form Submitted Successfully", "success");
             })
             .fail(function (xhr, status, error) {
                 console.log('FAILED...', xhr.responseText || error);
-                alert("Form Submission Failed! Try Again");
+                showNotification("Form Submission Failed! Try Again", "error");
             });
-        });
     });
+});
 
 document.addEventListener('visibilitychange',
     function () {
